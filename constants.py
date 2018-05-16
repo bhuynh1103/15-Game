@@ -26,5 +26,5 @@ black = gray(0)
 white = gray(255)
 
 # Constants
-screenSize = 800
+screenSize = 600
 boardSide = 4

@@ -8,24 +8,27 @@ pygame.init()
 screen = pygame.display.set_mode((screenSize, screenSize + screenSize // boardSide))
 
 while True:
+    # Setup functions
+    
+    # Generates grid array with Tiles
     grid = []
     num = 0
     for i in range(boardSide):
         grid.append([])
         for j in range(boardSide):
             num += 1
-            if num == 16:
+            if num == boardSide ** 2:
                 num = 0
             grid[i].append(Tile(i, j, num))
 
 
+    # Scrambles board
     count = 0    # \/ this number (the 50) MUST be even! Odd number will reseult in parity
     while count != 50:
         i = randint(0, boardSide - 1)
         j = randint(0, boardSide - 1)
         if grid[i][j].num != 0:
             store = grid[i][j].num
-
             a = randint(0, boardSide - 1)
             b = randint(0, boardSide - 1)
             if i != a and j != b and grid[a][b].num != 0:
@@ -34,15 +37,17 @@ while True:
                 count += 1
 
 
+    # Creates a solved array that has solution of board
     solved = []
     for i in range(boardSide):
         solved.append([])
         for j in range(boardSide):
             num += 1
-            if num == 16:
+            if num == boardSide ** 2:
                 num = 0
             solved[i].append(num)
 
+    # Game control variables
     clicked = False
     gameover = False
     moves = 0
@@ -50,6 +55,7 @@ while True:
     setup = True
 
     while setup:
+        # Game loop
         while not gameover:
             screen.fill(gray(200))
 
@@ -61,30 +67,25 @@ while True:
 
                     mousePos = pygame.mouse.get_pos()
                     if tile.has(mousePos) and clicked and tile.movable(grid):
-                        store = tile.num
-                        for a in range(-1, 2):
-                            for b in range(-1, 2):
-                                if abs(a) + abs(b) == 1:
-                                    x = tile.i + a
-                                    y = tile.j + b
-                                    if x >= 0 and x < boardSide and y >= 0 and y < boardSide and grid[x][y].num == 0:
-                                        grid[x][y].num = store
-                                        tile.num = 0
-                                        moves += 1
+                        tile.swap(grid)
+                        moves += 1
 
             writeText(screen, "Moves: " + str(moves), black, screenSize // 2, (screenSize // boardSide) * .5, screenSize // boardSide * .75)
 
+            #  'current' array holds current number positions
             current = []
             for i in range(boardSide):
                 current.append([])
                 for j in range(boardSide):
                     current[i].append(grid[i][j].num)
 
+            # Win condition
             if current == solved:
                 gameover = True
 
             pygame.display.update()
 
+            # Program end loop and input loop
             for event in pygame.event.get():
                 if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                     pygame.quit()
@@ -97,10 +98,11 @@ while True:
                 else:
                     clicked = False
 
-        # gameover loop`
+        # gameover loop
 
         screen.fill(gray(200))
 
+        # Draws tiles
         for i in range(boardSide):
             for j in range(boardSide):
                 grid[i][j].draw(screen)
@@ -110,6 +112,7 @@ while True:
 
         pygame.display.update()
 
+        # end program and input loop
         for event in pygame.event.get():
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
