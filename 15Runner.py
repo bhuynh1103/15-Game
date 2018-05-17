@@ -6,46 +6,46 @@ from random import randint
 
 pygame.init()
 screen = pygame.display.set_mode((screenSize, screenSize + screenSize // boardSide))
+pygame.display.set_caption("15 Game")
 
 while True:
     # Setup functions
-    
+
     # Generates grid array with Tiles
     grid = []
     num = 0
     for i in range(boardSide):
         grid.append([])
         for j in range(boardSide):
+            # num += 1
+            # if num == boardSide ** 2:
+            #     num = 0
+            grid[i].append(Tile(i, j))
+
+    current = []
+    num = 0
+    for i in range(boardSide):
+        current.append([])
+        for j in range(boardSide):
             num += 1
             if num == boardSide ** 2:
                 num = 0
-            grid[i].append(Tile(i, j, num))
-
+            current[i].append(num)
 
     # Scrambles board
     count = 0    # \/ this number (the 50) MUST be even! Odd number will reseult in parity
     while count != 50:
         i = randint(0, boardSide - 1)
         j = randint(0, boardSide - 1)
-        if grid[i][j].num != 0:
-            store = grid[i][j].num
+        if current[i][j] != 0:
+            store = current[i][j]
             a = randint(0, boardSide - 1)
             b = randint(0, boardSide - 1)
-            if i != a and j != b and grid[a][b].num != 0:
-                grid[i][j].num = grid[a][b].num
-                grid[a][b].num = store
+            if i != a and j != b and current[a][b] != 0:
+                current[i][j] = current[a][b]
+                current[a][b] = store
                 count += 1
 
-
-    # Creates a solved array that has solution of board
-    solved = []
-    for i in range(boardSide):
-        solved.append([])
-        for j in range(boardSide):
-            num += 1
-            if num == boardSide ** 2:
-                num = 0
-            solved[i].append(num)
 
     # Game control variables
     clicked = False
@@ -58,26 +58,33 @@ while True:
         # Game loop
         while not gameover:
             screen.fill(gray(200))
-
+ 
             for i in range(boardSide):
                 for j in range(boardSide):
                     tile = grid[i][j]
 
+                    tile.setNum(current)
                     tile.draw(screen)
 
+                    # Checks if tile is clicked and can be moved, if so, then moves tiles
                     mousePos = pygame.mouse.get_pos()
-                    if tile.has(mousePos) and clicked and tile.movable(grid):
-                        tile.swap(grid)
-                        moves += 1
+                    if tile.has(mousePos) and clicked and tile.movable(current):
+                        # Shifts tiles
+                        if 0 in current[i]:
+                            current[i].remove(0)
+                            current[i].insert(tile.j ,0)
+                        else:
+                            current = flip(current)
+                            current[j].remove(0)
+                            current[j].insert(tile.i ,0)
+                            current = flip(current)
+
+                        # Adds one to the move count for each shift made
+                        if tile.num != 0:
+                            moves += 1
 
             writeText(screen, "Moves: " + str(moves), black, screenSize // 2, (screenSize // boardSide) * .5, screenSize // boardSide * .75)
 
-            #  'current' array holds current number positions
-            current = []
-            for i in range(boardSide):
-                current.append([])
-                for j in range(boardSide):
-                    current[i].append(grid[i][j].num)
 
             # Win condition
             if current == solved:
@@ -105,6 +112,7 @@ while True:
         # Draws tiles
         for i in range(boardSide):
             for j in range(boardSide):
+                grid[i][j].setNum(current)
                 grid[i][j].draw(screen)
 
         writeText(screen, "Moves: " + str(moves), black, screenSize // 2, screenSize // boardSide * .33, screenSize // boardSide * .25)

@@ -3,17 +3,20 @@ from constants import *
 
 
 class Tile:
-    def __init__(self, i, j, num):
+    def __init__(self, i, j):
         # Tile's index in grid array
-        self.i = i 
+        self.i = i
         self.j = j
         # Draw specifications
         self.w = screenSize // boardSide
         self.x = j * self.w
         self.y = i * self.w + self.w
         # Tile's number
-        self.num = num
-        
+        self.num = None
+
+    def setNum(self, current):
+        self.num = current[self.i][self.j]
+
     # Draws number in tile
     def writeNum(self, window):
         writeText(window, str(self.num), black, self.x + self.w * .5, self.y + self.w * .5, self.w * .9)
@@ -35,29 +38,12 @@ class Tile:
                 mouseY > self.y and mouseY < self.y + self.w)
 
     # Checks if the tile with the moouse above it is able to be moved
-    def movable(self, grid):
-        for i in range(-1, 2):
-            for j in range(-1, 2):
-                if abs(i) + abs(j) == 1:
-                    x = self.i + i
-                    y = self.j + j
-                    if x >= 0 and x < boardSide and y >= 0 and y < boardSide and grid[x][y].num == 0:
-                        return True
-        return False
+    def movable(self, current):
+        if 0 in current[self.i]:
+            return True
+        else:
+            for x in range(len(current)):
+                if current[x][self.j] == 0:
+                    return True
 
-    # Swaps '0' tile with tile clicked
-    def swap(self, grid):
-        store = self.num
-        for a in range(-1, 2):
-            for b in range(-1, 2):
-                if abs(a) + abs(b) == 1:
-                    x = self.i + a
-                    y = self.j + b
-                    if x >= 0 and x < boardSide and y >= 0 and y < boardSide and grid[x][y].num == 0:
-                        grid[x][y].num = store
-                        self.num = 0
-        
-    # Pushes all other tiles in front of it if clicked       
-    def push(self):
-        pass
-                               
+        return False
