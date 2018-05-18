@@ -33,8 +33,14 @@ while True:
             current[i].append(num)
 
     # Scrambles board
-    count = 0    # \/ this number (the 50) MUST be even! Odd number will reseult in parity
-    while count != 50:
+    if (boardSide ** 2) % 2 != 0:
+        scramble = (boardSide ** 2) - 1
+    else:
+        scramble = (boardSide ** 2)
+        
+    count = 0
+        
+    while count != scramble:
         i = randint(0, boardSide - 1)
         j = randint(0, boardSide - 1)
         if current[i][j] != 0:

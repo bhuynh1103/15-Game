@@ -38,7 +38,7 @@ white = gray(255)
 
 # Constants
 screenSize = 800
-boardSide = 4
+boardSide = 10
 
 
 # Creates a solved array that has solution of board
